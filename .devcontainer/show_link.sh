@@ -1,6 +1,11 @@
 #!/bin/bash
-sudo /usr/local/bin/xray run -c /etc/xray/g2ray.json &>/tmp/xray.log &
-sleep 2
-show-link.sh
-echo "[g2ray] Keep-alive active..."
-while true; do sleep 300; echo "[$(date '+%H:%M')] alive" >>/tmp/keepalive.log; done
+CONFIG="/etc/xray/g2ray.json"
+UUID=$(grep -o '"id": *"[^"]*"' "$CONFIG" | head -1 | grep -o '"[^"]*"$' | tr -d '"')
+if [ -z "$UUID" ]; then echo "[g2ray] UUID پیدا نشد."; exit 1; fi
+SNI="${CODESPACE_NAME}-443.app.github.dev"
+LINK="vless://${UUID}@94.130.50.12:443?encryption=none&security=tls&sni=${SNI}&host=${SNI}&fp=chrome&allowInsecure=1&type=xhttp&mode=packet-up&path=%2F#dark-relay-73e4f9"
+echo ""
+echo "================================================"
+echo "  $LINK"
+echo "================================================"
+echo ""
